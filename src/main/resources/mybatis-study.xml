@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--<properties /> &lt;!&ndash;属性&ndash;&gt;-->
+    <!--<settings /> &lt;!&ndash;设置&ndash;&gt;-->
+
+    <!--<typeAliases /> &lt;!&ndash;类型别名&ndash;&gt;-->
+    <!--<typeHandlers /> &lt;!&ndash;类型处理器&ndash;&gt;-->
+    <!--<objectFactory /> &lt;!&ndash;对象工厂&ndash;&gt;-->
+    <!--<environments > &lt;!&ndash;配置环境&ndash;&gt;-->
+    <!--<environment > &lt;!&ndash;环境配置&ndash;&gt;-->
+    <!--<transactionManager ></transactionManager> &lt;!&ndash;事务管理器&ndash;&gt;-->
+    <!--<dataSource></dataSource> &lt;!&ndash;数据源&ndash;&gt;-->
+    <!--</environment>-->
+    <!--</environments>-->
+    <!--<databaseIdProvider /> &lt;!&ndash;数据库厂商&ndash;&gt;-->
+    <!--<mappers /> &lt;!&ndash;映射器&ndash;&gt;-->
+
+    <properties>
+        <property name="jdbc.driver" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbc.url" value="jdbc:mysql://localhost:3306/mybatis_studydb"/>
+        <property name="jdbc.username" value="root"/>
+        <property name="jdbc.password" value="123456"/>
+    </properties>
+
+
+    <typeAliases>
+        <!--全写-->
+        <typeAlias type="com.lzx.entity.Author" alias="author"/>
+        <typeAlias type="com.lzx.entity.Blog" alias="blog"/>
+        <!--简写，MyBatis自动扫描这个包下面的所有类，把第一字母变成小写作为别名-->
+        <package name="com.lzx.entity"/>
+    </typeAliases>
+    <typeHandlers>
+        <typeHandler handler="com.lzx.element.MyTypeHandler" javaType="string" jdbcType="VARCHAR"/>
+        <!--扫描包配置typeHandler-->
+        <package name="com.lzx.mytypehandler"/>
+    </typeHandlers>
+
+    <objectFactory type="com.lzx.element.MyObjectFactory">
+        <property name="properties" value="properties_value"/>
+    </objectFactory>
+    <plugins>
+        <plugin interceptor="com.lzx.element.MyPlugin">
+            <property name="someProperty" value="100"/>
+        </plugin>
+    </plugins>
+
+    <environments default="development">
+        <environment id="decelopment">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--方式一-->
+    <mappers>
+        <mapper resource="mapper/AuthorMapper.xml"/>
+        <mapper resource="mapper/BlogMapper.xml"/>
+    </mappers>
+    <!--方式二-->
+    <mappers>
+        <mapper url="file:///var/mapper/AuthorMapper.xml"/>
+        <mapper url="file:///var/mapper/BlogMapper.xml"/>
+    </mappers>
+    <!--方式三-->
+    <mappers>
+        <mapper class="mapper.AuthorMapper"/>
+        <mapper class="mapper.BlogMapper"/>
+    </mappers>
+    <!--方式四-->
+    <mappers>
+        <package name="mapper"/>
+    </mappers>
+</configuration>

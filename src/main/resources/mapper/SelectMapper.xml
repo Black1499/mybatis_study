@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lzx.select.mappers.SelectMapper">
+
+    <!-- Nested ResultSet -->
+    <resultMap id="invoiceAndBilling" type="InvoiceEntity">
+        <association property="billingInfoEntity" javaType="BillingInfoEntity" autoMapping="true"/>
+        <association property="customerEntity" resultMap="customerInfo"/>
+    </resultMap>
+    
+    <resultMap id="customerInfo" type="CustomerEntity" autoMapping="true">
+        <collection property="invoiceEntityList" resultMap="invoiceAndBilling" ofType="InvoiceEntity" />
+    </resultMap>
+
+
+    <select id="getInvoiceByInvoiceId" resultMap="invoiceAndBilling">
+        select * from invoice where invoice_id = #{id}
+    </select>
+
+    <select id="getInvoiceForCustomerByInvoiceId" resultMap="invoiceAndBilling">
+        select
+        i.invoice_id,
+        i.invoice_date,
+        i.billing_address,
+        i.billing_city,
+        i.billing_state,
+        i.billing_country,
+        i.billing_postalCode,
+        i.total,
+        c.*
+        from invoice i
+        left join customer c
+        on c.customer_id = i.invoice_id
+        where i.invoice_id = #{id}
+    </select>
+
+    <select id="getCustomerById" resultMap="customerInfo">
+      select *
+      from invoice i
+      left join customer c
+      on c.customer_id = i.invoice_id
+      where c.customer_id = #{id}
+    </select>
+
+
+
+
+
+    <!--Nested Select -->
+    <resultMap id="invoiceAndCustomer" type="InvoiceEntity" autoMapping="true">
+        <association property="billingInfoEntity" javaType="BillingInfoEntity" autoMapping="true"/>
+        <association property="customerEntity" column="customer_id"
+                     select="com.lzx.select.mappers.SelectMapper.getCusById"/>
+    </resultMap>
+
+    <resultMap id="customerAndInvoice" type="CustomerEntity" autoMapping="true">
+        <collection property="invoiceEntityList" column="customer_id"
+                    select="com.lzx.select.mappers.SelectMapper.getIncByCustomerId"/>
+    </resultMap>
+
+
+
+    <select id="getIncByCustomerId" resultMap="invoiceAndCustomer" >
+        select * from invoice where customer_id = #{id}
+    </select>
+
+    <select id="getCusById" resultMap="customerAndInvoice">
+        select * from customer where customer_id = #{id}
+    </select>
+
+    <select id="getAll" resultType="com.lzx.select.entity.CustomerEntity">
+        select * from customer
+    </select>
+
+</mapper>
